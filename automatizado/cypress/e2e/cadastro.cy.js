@@ -1,24 +1,12 @@
 // Testes automatizados — Cadastro de Usuário
 // Autor: João Fray
 // Ferramenta: Cypress + JavaScript
+// Site de prática: https://demoqa.com/automation-practice-form
 // Data: Março/2026
 
-// IMPORTANTE: Substitua a URL abaixo pela URL real do sistema que você está testando
-const BASE_URL = 'https://sua-aplicacao.com/cadastro'
+const BASE_URL = 'https://demoqa.com/automation-practice-form'
 
-// Seletores dos campos do formulário
-// Adapte os seletores conforme o HTML da aplicação real
-const SELECTORS = {
-  nome:             '[data-cy="input-nome"]',
-  email:            '[data-cy="input-email"]',
-  senha:            '[data-cy="input-senha"]',
-  confirmacaoSenha: '[data-cy="input-confirmacao-senha"]',
-  btnCadastrar:     '[data-cy="btn-cadastrar"]',
-  mensagemSucesso:  '[data-cy="msg-sucesso"]',
-  mensagemErro:     '[data-cy="msg-erro"]',
-}
-
-describe('Cadastro de Usuário', () => {
+describe('Formulário de Cadastro — DemoQA', () => {
 
   beforeEach(() => {
     cy.visit(BASE_URL)
@@ -27,95 +15,89 @@ describe('Cadastro de Usuário', () => {
   // --------------------------------------------------
   // CT001 — Cadastro com dados válidos (Positivo)
   // --------------------------------------------------
-  it('CT001 — deve realizar o cadastro com sucesso quando os dados são válidos', () => {
-    cy.get(SELECTORS.nome)
-      .type('João Fray')
+  it('CT001 — deve preencher o formulário com sucesso quando os dados são válidos', () => {
+    cy.get('#firstName')
+      .type('João')
 
-    cy.get(SELECTORS.email)
-      .type('joao.fray.teste@email.com')
+    cy.get('#lastName')
+      .type('Fray')
 
-    cy.get(SELECTORS.senha)
-      .type('Senha@123')
+    cy.get('#userEmail')
+      .type('joao.fray@email.com')
 
-    cy.get(SELECTORS.confirmacaoSenha)
-      .type('Senha@123')
-
-    cy.get(SELECTORS.btnCadastrar)
+    cy.get('[for="gender-radio-1"]')
       .click()
 
-    cy.get(SELECTORS.mensagemSucesso)
+    cy.get('#userNumber')
+      .type('19987654321')
+
+    cy.get('#submit')
+      .click()
+
+    cy.get('#example-modal-sizes-title-lg')
       .should('be.visible')
-      .and('contain.text', 'Cadastro realizado com sucesso')
+      .and('contain.text', 'Thanks for submitting the form')
   })
 
   // --------------------------------------------------
-  // CT003 — Campo obrigatório vazio (Negativo)
+  // CT003 — Campos obrigatórios vazios (Negativo)
   // --------------------------------------------------
-  it('CT003 — deve exibir erro quando campo obrigatório está vazio', () => {
-    // Deixa o campo Nome em branco e preenche o resto
-    cy.get(SELECTORS.email)
-      .type('joao.fray.teste@email.com')
-
-    cy.get(SELECTORS.senha)
-      .type('Senha@123')
-
-    cy.get(SELECTORS.confirmacaoSenha)
-      .type('Senha@123')
-
-    cy.get(SELECTORS.btnCadastrar)
+  it('CT003 — não deve enviar o formulário quando campos obrigatórios estão vazios', () => {
+    cy.get('#submit')
       .click()
 
-    cy.get(SELECTORS.mensagemErro)
-      .should('be.visible')
-      .and('contain.text', 'obrigatório')
+    cy.get('#firstName')
+      .should('have.css', 'border-color', 'rgb(220, 53, 69)')
   })
 
   // --------------------------------------------------
   // CT004 — E-mail com formato inválido (Negativo)
   // --------------------------------------------------
-  it('CT004 — deve exibir erro quando o e-mail tem formato inválido', () => {
-    cy.get(SELECTORS.nome)
-      .type('João Fray')
+  it('CT004 — deve marcar campo como inválido quando o e-mail tem formato incorreto', () => {
+    cy.get('#firstName')
+      .type('João')
 
-    cy.get(SELECTORS.email)
-      .type('emailsemarrobapontocom') // formato inválido
+    cy.get('#lastName')
+      .type('Fray')
 
-    cy.get(SELECTORS.senha)
-      .type('Senha@123')
+    cy.get('#userEmail')
+      .type('emailsemarroba')
 
-    cy.get(SELECTORS.confirmacaoSenha)
-      .type('Senha@123')
-
-    cy.get(SELECTORS.btnCadastrar)
+    cy.get('[for="gender-radio-1"]')
       .click()
 
-    cy.get(SELECTORS.mensagemErro)
-      .should('be.visible')
-      .and('contain.text', 'e-mail válido')
+    cy.get('#userNumber')
+      .type('19987654321')
+
+    cy.get('#submit')
+      .click()
+
+    cy.get('#userEmail')
+      .should('have.css', 'border-color', 'rgb(220, 53, 69)')
   })
 
   // --------------------------------------------------
-  // CT006 — Senha diferente da confirmação (Negativo)
+  // CT006 — Nome deixado em branco (Negativo)
   // --------------------------------------------------
-  it('CT006 — deve exibir erro quando senha e confirmação são diferentes', () => {
-    cy.get(SELECTORS.nome)
-      .type('João Fray')
+  it('CT006 — deve marcar campo como inválido ao deixar o nome em branco', () => {
+    cy.get('#firstName')
+      .click()
+      .clear()
 
-    cy.get(SELECTORS.email)
-      .type('joao.fray.teste@email.com')
+    cy.get('#lastName')
+      .type('Fray')
 
-    cy.get(SELECTORS.senha)
-      .type('Senha@123')
-
-    cy.get(SELECTORS.confirmacaoSenha)
-      .type('Senha@456') // diferente da senha
-
-    cy.get(SELECTORS.btnCadastrar)
+    cy.get('[for="gender-radio-1"]')
       .click()
 
-    cy.get(SELECTORS.mensagemErro)
-      .should('be.visible')
-      .and('contain.text', 'senhas não coincidem')
+    cy.get('#userNumber')
+      .type('19987654321')
+
+    cy.get('#submit')
+      .click()
+
+    cy.get('#firstName')
+      .should('have.css', 'border-color', 'rgb(220, 53, 69)')
   })
 
 })
